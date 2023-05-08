@@ -1,0 +1,14 @@
+@prefix ex: <http://example.com/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+ex:JohnDoe rdf:type ex:Person ;
+         ex:name "John Doe" ;
+         ex:age 35 ;
+         ex:hasAddress ex:Address1 .
+
+ex:Address1 rdf:type ex:Address ;
+            ex:street "123 Main St" ;
+            ex:city "Anytown" ;
+            ex:state "CA" ;
+            ex:zip "12345" .
