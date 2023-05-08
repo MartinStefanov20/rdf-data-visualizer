@@ -1,8 +1,6 @@
 <script>
-
     import * as d3 from "d3";
     import {fetchedData, selectedPredicates} from "./stores/rdfStore";
-    import FilterComponent from "./FilterComponent.svelte";
 
     let svg;
 
@@ -22,11 +20,7 @@
             svg.selectAll('*').remove();
         }
 
-        console.log($selectedPredicates)
-        console.log("asd")
         d3Graph = $fetchedData;
-
-        console.log(d3Graph)
 
         const filteredNodesMap = new Map(); // To store unique nodes
 
@@ -45,9 +39,6 @@
         const filteredLinks = d3Graph.links.filter((link) =>
             $selectedPredicates.includes(link.label)
         );
-
-        console.log(filteredNodes)
-        console.log(filteredLinks)
 
         const width = 1400;
         const height = 1000;
@@ -156,14 +147,8 @@
                 .attr("y", d => d.y);
         });
 
-        console.log("svg is ", svg)
     }
 
-
-
 </script>
-
-<!--<FilterComponent on:predicatesSelected="{event => selectedPredicates = event.detail}" />-->
-
 
 <svg></svg>

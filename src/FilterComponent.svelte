@@ -1,11 +1,5 @@
 <script>
-    import { createEventDispatcher } from 'svelte';
     import {predicates, selectedPredicates} from "./stores/rdfStore";
-
-
-     // List of available predicates
-
-    const dispatch = createEventDispatcher();
 
     function handleCheckboxChange(event) {
         const { value, checked } = event.target;
@@ -14,8 +8,8 @@
         } else {
             selectedPredicates.set($selectedPredicates.filter((predicate) => predicate !== value));
         }
-        // dispatch('predicatesSelected', selectedPredicates);
     }
+
 </script>
 
 {#if $predicates}

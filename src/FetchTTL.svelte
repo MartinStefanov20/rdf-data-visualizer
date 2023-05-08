@@ -1,5 +1,4 @@
 <script>
-    import { onMount } from 'svelte';
     import * as rdfx from 'rdflib'
     import {fetchedData, predicates} from "./stores/rdfStore";
 
@@ -8,15 +7,11 @@
     let url = "https://dbpedia.org/data/"
 
     async function fetchTTL() {
-        console.log("fetching")
         const response = await fetch(url+urlPart+".ttl");
         const ttl = await response.text();
         let graph = rdfx.graph()
 
         rdfx.parse(ttl, graph, url+urlPart+".ttl", 'text/turtle');
-        console.log("Graph in fetchTTL")
-
-        console.log(graph);
 
         const nodes = [];
         const links = [];
@@ -28,6 +23,8 @@
 
             const predicate = quad.predicate.value
 
+
+            //Add the subject node
             const subject = quad.subject.value;
             const subjectNode = nodes.find((node) => node.id === subject && node.type === 'SUBJECT')
             if (subjectNode){
@@ -35,14 +32,6 @@
             } else {
                 nodes.push({ id: subject, label: subject, type: "SUBJECT", predicate: predicate });
             }
-
-
-
-
-
-            // if (!nodes.find((node) => node.id === subject && node.type === "SUBJECT" && node.predicate === predicate)) {
-            //     nodes.push({ id: subject, label: subject, type: "SUBJECT", predicate: predicate });
-            // }
 
 
             // Add the object node to the nodes array
@@ -53,10 +42,7 @@
             } else {
                 nodes.push({ id: object, label: object, type: "OBJECT", predicate: predicate });
             }
-            // if (!nodes.find((node) => node.id === object && node.type === "OBJECT"  && node.predicate === predicate)) {
-            //
-            //     nodes.push({ id: object, label: object, type: "OBJECT", predicate: predicate });
-            // }
+
 
             // Add the link to the links array
             links.push({
@@ -74,7 +60,6 @@
         predicates.set(predicatesList)
 
         fetchedData.set({nodes, links})
-
 
     }
 
