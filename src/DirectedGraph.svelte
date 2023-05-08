@@ -17,15 +17,31 @@
             return
         }
 
+        // Clear existing SVG
+        if (svg) {
+            svg.selectAll('*').remove();
+        }
+
         console.log(selectedPredicates)
         console.log("asd")
         d3Graph = $fetchedData;
 
         console.log(d3Graph)
 
-        const filteredNodes = d3Graph.nodes.filter((node) =>
-            selectedPredicates.includes(node.predicate)
-        );
+        const filteredNodesMap = new Map(); // To store unique nodes
+
+        d3Graph.nodes.forEach((node) => {
+            const nodePredicates = node.predicate.split(',').map((p) => p.trim());
+            const hasMatchingPredicate = nodePredicates.some((p) =>
+                selectedPredicates.includes(p)
+            );
+            if (hasMatchingPredicate) {
+                filteredNodesMap.set(node.id, node);
+            }
+        });
+
+        const filteredNodes = Array.from(filteredNodesMap.values());
+
         const filteredLinks = d3Graph.links.filter((link) =>
             selectedPredicates.includes(link.label)
         );
@@ -40,14 +56,14 @@
             .attr("width", width)
             .attr("height", height);
 
-        const simulation = d3.forceSimulation(d3Graph.nodes)
-            .force("link", d3.forceLink(d3Graph.links).id(d => d.id).distance(300))
+        const simulation = d3.forceSimulation(filteredNodes)
+            .force("link", d3.forceLink(filteredLinks).id(d => d.id).distance(300))
             .force("charge", d3.forceManyBody().strength(-300))
             .force("center", d3.forceCenter(width / 2, height / 2));
 
         const link = svg.append("g")
             .selectAll("line")
-            .data(d3Graph.links)
+            .data(filteredLinks)
             .enter()
             .append("line")
             .attr("stroke", "#999")
@@ -55,7 +71,7 @@
 
         const node = svg.append("g")
             .selectAll("circle")
-            .data(d3Graph.nodes)
+            .data(filteredNodes)
             .enter()
             .append("circle")
             .attr("r", 50)
@@ -78,7 +94,7 @@
 
         const label = svg.append("g")
             .selectAll("text")
-            .data(d3Graph.nodes)
+            .data(filteredNodes)
             .enter()
             .append("text")
             .attr("text-anchor", "middle")
@@ -90,7 +106,7 @@
 
         const labelLink = svg.append("g")
             .selectAll("text")
-            .data(d3Graph.links)
+            .data(filteredLinks)
             .enter()
             .append("text")
             .attr("text-anchor", "middle")

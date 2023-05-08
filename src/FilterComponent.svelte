@@ -15,7 +15,6 @@
         } else {
             selectedPredicates = selectedPredicates.filter((predicate) => predicate !== value);
         }
-        console.log(selectedPredicates)
         dispatch('predicatesSelected', selectedPredicates);
     }
 </script>
