@@ -1,6 +1,7 @@
 <script>
     import * as d3 from "d3";
     import {fetchedData, selectedPredicates} from "./stores/rdfStore";
+    import {fetchTTL} from "./fetchTTL";
 
     let svg;
 
@@ -96,7 +97,10 @@
                 .on("start", dragstarted)
                 .on("drag", dragged)
                 .on("end", dragended)
-            );
+            )
+            .on("dblclick", (event, d) => {
+                handleDoubleClick(d);
+            });
 
         const label = svg.append("g")
             .selectAll("text")
@@ -162,6 +166,12 @@
                 .attr("y", d => d.y);
         });
 
+    }
+
+    function handleDoubleClick(d){
+        let url = d.id
+        url = url.replace(new RegExp("/resource/", "g"), "/data/")
+        fetchTTL(url+".ttl")
     }
 
 </script>
