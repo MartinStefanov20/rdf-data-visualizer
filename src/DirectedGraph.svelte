@@ -47,6 +47,20 @@
             .attr("width", width)
             .attr("height", height);
 
+        svg
+            .append("defs")
+            .append("marker")
+            .attr("id", "arrowhead")
+            .attr("viewBox", "-5 -5 10 10")
+            .attr("refX", 25)
+            .attr("refY", 0)
+            .attr("orient", "auto")
+            .attr("markerWidth", 25)
+            .attr("markerHeight", 25)
+            .append("path")
+            .attr("d", "M0,-5L10,0L0,5")
+            .attr("fill", "#999");
+
         const simulation = d3.forceSimulation(filteredNodes)
             .force("link", d3.forceLink(filteredLinks).id(d => d.id).distance(300))
             .force("charge", d3.forceManyBody().strength(-300))
@@ -58,7 +72,8 @@
             .enter()
             .append("line")
             .attr("stroke", "#999")
-            .attr("stroke-width", "1px");
+            .attr("stroke-width", "1px")
+            .attr("marker-end", "url(#arrowhead)"); // Add the arrow marker to the links
 
         const node = svg.append("g")
             .selectAll("circle")
