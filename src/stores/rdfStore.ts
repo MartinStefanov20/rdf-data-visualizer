@@ -5,4 +5,4 @@ export const fetchedData = writable()
 
 export const predicates = writable()
 
-export const selectedPredicates = writable()
+export const selectedPredicates = writable([])

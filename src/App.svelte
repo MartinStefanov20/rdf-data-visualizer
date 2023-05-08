@@ -50,17 +50,38 @@
 
 </script>
 
+<style>
+    .app-container {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+    }
 
-<div>
-    <FetchTTL/>
-</div>
+    .main-container {
+        flex: 1;
+        display: flex;
+    }
 
+    .graph-container {
+        flex: 4;
+        padding: 20px;
+    }
 
-<div>
-    <DirectedGraph/>
-</div>
+    .filter-container {
+        flex: 1;
+        padding: 20px;
+    }
+</style>
 
-<div>
-    <FilterComponent/>
+<div class="app-container">
+    <FetchTTL />
+    <div class="main-container">
+        <div class="graph-container">
+            <DirectedGraph />
+        </div>
+        <div class="filter-container">
+            <FilterComponent />
+        </div>
+    </div>
 </div>
 

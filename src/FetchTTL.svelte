@@ -80,12 +80,21 @@
 
 </script>
 
-<input bind:value={urlPart}>
-<button on:click={fetchTTL}>Fetch</button>
+<style>
+    .container {
+        display: flex; /* Use flexbox to create a horizontal layout */
+        align-items: center; /* Center the items vertically within the container */
+        justify-content: center;
+    }
 
+    .input-field {
+        margin-right: 10px; /* Add some spacing between the input field and the button */
+    }
+</style>
 
-<!--{#if $asd}-->
-<!--    {#each $asd.nodes as node}-->
-<!--        <p>{node.label}</p>-->
-<!--    {/each}-->
-<!--{/if }-->
+<div class="container">
+    <div class="input-field">
+        <input bind:value={urlPart} />
+    </div>
+    <button on:click={fetchTTL}>Fetch</button>
+</div>

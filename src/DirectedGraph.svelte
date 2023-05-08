@@ -1,16 +1,16 @@
 <script>
 
     import * as d3 from "d3";
-    import {fetchedData} from "./stores/rdfStore";
+    import {fetchedData, selectedPredicates} from "./stores/rdfStore";
     import FilterComponent from "./FilterComponent.svelte";
 
     let svg;
 
     let d3Graph;
 
-    let selectedPredicates = [];
+    selectedPredicates
 
-    $: selectedPredicates, $fetchedData, makeSvg();
+    $: $selectedPredicates, $fetchedData, makeSvg();
 
     function makeSvg(){
         if ($fetchedData === undefined){
@@ -22,7 +22,7 @@
             svg.selectAll('*').remove();
         }
 
-        console.log(selectedPredicates)
+        console.log($selectedPredicates)
         console.log("asd")
         d3Graph = $fetchedData;
 
@@ -33,7 +33,7 @@
         d3Graph.nodes.forEach((node) => {
             const nodePredicates = node.predicate.split(',').map((p) => p.trim());
             const hasMatchingPredicate = nodePredicates.some((p) =>
-                selectedPredicates.includes(p)
+                $selectedPredicates.includes(p)
             );
             if (hasMatchingPredicate) {
                 filteredNodesMap.set(node.id, node);
@@ -43,13 +43,13 @@
         const filteredNodes = Array.from(filteredNodesMap.values());
 
         const filteredLinks = d3Graph.links.filter((link) =>
-            selectedPredicates.includes(link.label)
+            $selectedPredicates.includes(link.label)
         );
 
         console.log(filteredNodes)
         console.log(filteredLinks)
 
-        const width = 1900;
+        const width = 1400;
         const height = 1000;
 
         svg = d3.select("svg")
@@ -163,7 +163,7 @@
 
 </script>
 
-<FilterComponent on:predicatesSelected="{event => selectedPredicates = event.detail}" />
+<!--<FilterComponent on:predicatesSelected="{event => selectedPredicates = event.detail}" />-->
 
 
 <svg></svg>
