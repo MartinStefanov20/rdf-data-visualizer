@@ -1,5 +1,5 @@
 import * as rdfx from "rdflib";
-import {fetchedData, predicates} from "./stores/rdfStore";
+import {fetchedData, predicates, predicateLabels} from "./stores/rdfStore";
 
 export async function fetchTTL(url){
     const response = await fetch(url);
@@ -16,43 +16,100 @@ export async function fetchTTL(url){
     let predicatesList = [];
     predicates.subscribe((data) => predicatesList = data)
 
-    console.log('asd', url)
+    var parts = url.split("/").filter(Boolean); // Filter to remove empty elements
 
+    let urlPart = parts[parts.length - 1];
 
     graph.match().forEach((quad) => {
 
-        const predicate = quad.predicate.value
+        let predicate = quad.predicate.value
 
+        if (predicateLabels[predicate]){
+            predicate = predicateLabels[predicate]
+        }
 
-        //Add the subject node
         const subject = quad.subject.value;
         const subjectNode = nodes.find((node) => node.id === subject && node.type === 'SUBJECT')
-        if (subjectNode){
-            subjectNode.predicate += `, ${predicate}`
+        const quadObject = quad.object
+        let object = quad.object.value;
+        const objectNode = nodes.find((node) => node.id === object && node.type === "OBJECT")
+
+        //Add the subject node
+        if (predicate == "http://www.w3.org/2000/01/rdf-schema#label") {
+            if (quadObject.language == "en") {
+                if (subjectNode) {
+                    subjectNode.label = quadObject.value
+                    subjectNode.predicate += `, ${predicate}`
+                } else {
+                    nodes.push({id: subject, label: quadObject.value, type: "SUBJECT", predicate: predicate});
+                }
+            }
         } else {
-            nodes.push({ id: subject, label: subject, type: "SUBJECT", predicate: predicate });
+            if (subjectNode){
+                subjectNode.predicate += `, ${predicate}`
+            } else {
+                nodes.push({ id: subject, label: subject, type: "SUBJECT", predicate: predicate });
+            }
         }
 
 
         // Add the object node to the nodes array
-        const object = quad.object.value;
-        const objectNode = nodes.find((node) => node.id === object && node.type === "OBJECT")
-        if (objectNode){
-            objectNode.predicate += `, ${predicate}`
+        if (predicate == "has abstract"){
+            if (quadObject.language == "en") {
+                if (object.length > 40) {
+                    object = object.substring(0, 40) + "...";
+                } else {
+                    // If the string is already 20 characters or shorter, no need to trim
+                    object = object;
+                }
+                if (objectNode){
+                    objectNode.predicate += `, ${predicate}`
+                } else {
+                    if(quadObject.termType == "Literal") {
+                        nodes.push({ id: object, label: object, type: "LITERAL", predicate: predicate });
+                    }
+                    else {
+                        nodes.push({id: object, label: object, type: "OBJECT", predicate: predicate});
+                    }
+                }
+                // Add the link to the links array
+                links.push({
+                    source: subject,
+                    target: object,
+                    label: predicate,
+                });
+                console.log("aaa ", object)
+            }
         } else {
-            nodes.push({ id: object, label: object, type: "OBJECT", predicate: predicate });
+
+            if (objectNode){
+                if (objectNode.id == "http://dbpedia.org/resource/Skopje"){
+                    objectNode.label = "Skopje"
+                }
+                objectNode.predicate += `, ${predicate}`
+            } else {
+                if(quadObject.termType == "Literal") {
+                    nodes.push({ id: object, label: object, type: "LITERAL", predicate: predicate });
+                }
+                else {
+                    nodes.push({id: object, label: object, type: "OBJECT", predicate: predicate});
+                }
+            }
+            // Add the link to the links array
+            links.push({
+                source: subject,
+                target: object,
+                label: predicate,
+            });
         }
 
+        if (!predicatesList.find((d) => {
+            let index = d.indexOf(", ") + 2;
+            let result = d.slice(index);
+            return result === predicate;
+        })){
+            predicatesList.push(`${urlPart}, ${predicate}`)
 
-        // Add the link to the links array
-        links.push({
-            source: subject,
-            target: object,
-            label: quad.predicate.value,
-        });
-
-        if (!predicatesList.find((d) => d === predicate)){
-            predicatesList.push(predicate)
         }
     });
 

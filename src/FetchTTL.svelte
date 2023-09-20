@@ -2,25 +2,25 @@
     import {fetchTTL} from "./fetchTTL";
 
     let urlPart = ""
-    let url = "https://dbpedia.org/data/"
+    let url = "https://dbpedia.org/data/Lionel_Messi.ttl"
 
 </script>
 
 <style>
     .container {
-        display: flex; /* Use flexbox to create a horizontal layout */
-        align-items: center; /* Center the items vertically within the container */
+        display: flex;
+        align-items: center;
         justify-content: center;
     }
 
     .input-field {
-        margin-right: 10px; /* Add some spacing between the input field and the button */
+        margin-right: 10px;
     }
 </style>
 
 <div class="container">
     <div class="input-field">
-        <input bind:value={urlPart} />
+        <input style="width: 400px" bind:value={url} />
     </div>
-    <button on:click={fetchTTL(url+urlPart+".ttl")}>Fetch</button>
+    <button on:click={fetchTTL(url)}>Fetch</button>
 </div>

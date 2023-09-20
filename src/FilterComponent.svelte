@@ -1,33 +1,58 @@
 <script>
-    import {predicates, selectedPredicates} from "./stores/rdfStore";
+    import { predicates, selectedPredicates } from "./stores/rdfStore";
 
-    function handleCheckboxChange(event) {
-        const { value, checked } = event.target;
-        if (checked) {
-            selectedPredicates.set([...$selectedPredicates, value]);
-        } else {
-            selectedPredicates.set($selectedPredicates.filter((predicate) => predicate !== value));
-        }
+    let selectedUrlPart = "";
+    let filteredPredicates = [];
+
+    function handleDropdownChange(event) {
+        selectedUrlPart = event.target.value;
     }
 
+    $: {
+        filteredPredicates = $predicates.filter(predicate => {
+            return predicate.startsWith(selectedUrlPart);
+        });
+    }
+
+    function handleCheckboxChange(event) {
+        const {value, checked} = event.target;
+        if (checked) {
+            let index = value.indexOf(", ") + 2;
+            let result = value.slice(index);
+            selectedPredicates.set([...$selectedPredicates, result]);
+        } else {
+            selectedPredicates.set($selectedPredicates.filter((predicate) => {
+                let index = value.indexOf(", ") + 2;
+                let result = value.slice(index);
+                return predicate !== result;
+            }));
+        }
+    }
 </script>
 
-{#if $predicates}
+<div>
+    <label for="urlPartDropdown">Select urlPart: </label>
+    <select id="urlPartDropdown" bind:value={selectedUrlPart} on:change={handleDropdownChange}>
+        {#each Array.from(new Set($predicates.map(predicate => predicate.slice(0, predicate.indexOf(", "))))) as urlPart}
+            <option value={urlPart}>{urlPart}</option>
+        {/each}
+    </select>
+</div>
+
 <div>
     <ul>
-        {#each $predicates as predicate}
+        {#each filteredPredicates as predicate}
             <li>
-            <label>
-                <input
-                        type="checkbox"
-                        checked={$selectedPredicates.includes(predicate)}
-                        value={predicate}
-                        on:change={handleCheckboxChange}
-                />
-                {predicate}
-            </label>
+                <label>
+                    <input
+                            type="checkbox"
+                            checked={$selectedPredicates.includes(predicate)}
+                            value={predicate}
+                            on:change={handleCheckboxChange}
+                    />
+                    {predicate}
+                </label>
             </li>
         {/each}
     </ul>
 </div>
-{/if}

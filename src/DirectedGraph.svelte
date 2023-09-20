@@ -78,19 +78,38 @@
 
         const node = svg.append("g")
             .selectAll("circle")
-            .data(filteredNodes)
+            .data(filteredNodes.filter(d => d.type === "SUBJECT" || d.type === "OBJECT"))
             .enter()
             .append("circle")
             .attr("r", 50)
-            .attr("fill", d => { // use a function to set the fill color based on the node type
+            .attr("fill", d => {
                 if (d.type === "SUBJECT") {
-                    return "blue";
+                    return "#FF6B6B";
                 } else if (d.type === "OBJECT") {
-                    return "red";
+                    return "#6BB5FF";
                 } else {
                     return "#fff";
                 }
             })
+            .attr("stroke", "#000")
+            .attr("stroke-width", "1px")
+            .call(d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended)
+            )
+            .on("dblclick", (event, d) => {
+                handleDoubleClick(d);
+            });
+
+        const literalNode = svg.append("g")
+            .selectAll("rect")
+            .data(filteredNodes.filter(d => d.type === "LITERAL")) // Filter for literal nodes
+            .enter()
+            .append("rect")
+            .attr("width", 100)
+            .attr("height", 100)
+            .attr("fill", "#66FF99")
             .attr("stroke", "#000")
             .attr("stroke-width", "1px")
             .call(d3.drag()
@@ -110,9 +129,7 @@
             .attr("text-anchor", "middle")
             .attr("dy", "0.1em")
             .attr("fill", "#000")
-            .text(d => {
-                return d.id.replace(new RegExp("http://dbpedia.org/resource/", "g"), "")
-            });
+            .text(d => d.label);
 
         const labelLink = svg.append("g")
             .selectAll("text")
@@ -127,7 +144,7 @@
             });
 
         node.append("title")
-            .text(d => d.id);
+            .text(d => d.label);
 
         function dragstarted(event, d) {
             if (!event.active) simulation.alphaTarget(0.3).restart();
@@ -160,6 +177,10 @@
             node
                 .attr("cx", d => d.x)
                 .attr("cy", d => d.y);
+
+            literalNode
+                .attr("x", d => d.x - 50)
+                .attr("y", d => d.y - 50);
 
             label
                 .attr("x", d => d.x)
